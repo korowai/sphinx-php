@@ -58,12 +58,19 @@ def php_method_role(typ, rawtext, text, lineno, inliner, options={}, content=[])
     env = inliner.document.settings.env
     has_explicit_title, title, class_and_method = split_explicit_title(text)
 
-    ns = class_and_method.rfind('::')
-    full_class = class_and_method[:ns]
-    method = class_and_method[ns+2:]
-    backslash = full_class.rfind('\\')
-    namespace = full_class[:backslash]
-    class_name = full_class[backslash+1:]
+    class_and_method = class_and_method.rsplit('::', 1)
+    method = class_and_method[-1]
+    if len(class_and_method) == 2:
+        full_class = class_and_method[0]
+    else:
+        full_class = ''
+
+    ns_and_class = full_class.rsplit('\\', 1)
+    class_name = ns_and_class[-1]
+    if len(ns_and_class) == 2:
+        namespace = ns_and_class[0]
+    else:
+        namespace = ''
 
     if len(re.findall(r'[^\\]\\[^\\]', rawtext)) > 0:
         env.warn(env.docname, 'backslash not escaped in %s' % rawtext, lineno)
@@ -73,6 +80,29 @@ def php_method_role(typ, rawtext, text, lineno, inliner, options={}, content=[])
     if not has_explicit_title:
         title = method + '()'
     list = [nodes.reference(title, title, internal=False, refuri=full_url, reftitle=full_class + '::' + method + '()')]
+    pnode = nodes.literal('', '', *list)
+    return [pnode], []
+
+def php_func_role(typ, rawtext, text, lineno, inliner, options={}, content=[]):
+    text = utils.unescape(text)
+    env = inliner.document.settings.env
+    has_explicit_title, title, full_func = split_explicit_title(text)
+
+    ns_and_func = full_func.rsplit('\\', 1)
+    func = ns_and_func[-1]
+    if len(ns_and_func) == 2:
+        namespace = ns_and_func[0]
+    else:
+        namespace = ''
+
+    if len(re.findall(r'[^\\]\\[^\\]', rawtext)) > 0:
+        env.warn(env.docname, 'backslash not escaped in %s' % rawtext, lineno)
+
+    full_url = build_url('func', namespace, None, func, inliner)
+
+    if not has_explicit_title:
+        title = func + '()'
+    list = [nodes.reference(title, title, internal=False, refuri=full_url, reftitle=full_func + '()')]
     pnode = nodes.literal('', '', *list)
     return [pnode], []
 
@@ -123,6 +153,7 @@ def setup(app):
     app.add_role_to_domain('php', 'namespace', php_namespace_role)
     app.add_role_to_domain('php', 'class', php_class_role)
     app.add_role_to_domain('php', 'method', php_method_role)
+    app.add_role_to_domain('php', 'func', php_func_role)
     app.add_role_to_domain('php', 'phpclass', php_phpclass_role)
     app.add_role_to_domain('php', 'phpmethod', php_phpmethod_role)
     app.add_role_to_domain('php', 'phpfunction', php_phpfunction_role)
@@ -145,7 +176,7 @@ def build_url(role, namespace, class_name, method, inliner):
         namespace = namespace.replace('\\', '/')
 
     if (env.app.config.api_url_pattern is None):
-        fqcn = '%(namespace)s{class}/%(class)s{/class}{method}/%(class)s{/method}'
+        fqcn = '%(namespace)s{class}/%(class)s{/class}{method}/%(class)s{/method}{func}/func-%(method)s{/func}'
         api_url_pattern = env.app.config.api_url.replace('%s', fqcn)
         api_url_pattern += '.html{method}#method_%(method)s{/method}'
     else:
@@ -154,7 +185,7 @@ def build_url(role, namespace, class_name, method, inliner):
     api_url_pattern = api_url_pattern.replace('{'+role+'}', '')
     api_url_pattern = api_url_pattern.replace('{/'+role+'}', '')
 
-    for unused_role in ('namespace', 'class', 'method'):
+    for unused_role in ('namespace', 'class', 'method', 'func'):
         api_url_pattern = re.sub(r'{'+unused_role+'}.*?{/'+unused_role+'}', '', api_url_pattern)
 
     try:
