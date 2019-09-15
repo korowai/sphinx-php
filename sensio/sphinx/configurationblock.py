@@ -92,7 +92,7 @@ def setup(app):
     app.add_node(configurationblock,
                  html=(visit_configurationblock_html, depart_configurationblock_html),
                  latex=(visit_configurationblock_latex, depart_configurationblock_latex))
-    app.add_directive('configuration-block', ConfigurationBlock)
+    app.add_directive_to_domain('php', 'configuration-block', ConfigurationBlock)
     app.add_config_value('config_block', {}, 'env')
 
     return {'parallel_read_safe': True}

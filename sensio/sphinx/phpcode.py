@@ -120,12 +120,12 @@ def setup(app):
     app.add_config_value('api_url', {}, 'env')
     app.add_config_value('api_url_pattern', None, 'env')
     app.add_config_value('namespace_separator', '/', 'env')
-    app.add_role('namespace', php_namespace_role)
-    app.add_role('class', php_class_role)
-    app.add_role('method', php_method_role)
-    app.add_role('phpclass', php_phpclass_role)
-    app.add_role('phpmethod', php_phpmethod_role)
-    app.add_role('phpfunction', php_phpfunction_role)
+    app.add_role_to_domain('php', 'namespace', php_namespace_role)
+    app.add_role_to_domain('php', 'class', php_class_role)
+    app.add_role_to_domain('php', 'method', php_method_role)
+    app.add_role_to_domain('php', 'phpclass', php_phpclass_role)
+    app.add_role_to_domain('php', 'phpmethod', php_phpmethod_role)
+    app.add_role_to_domain('php', 'phpfunction', php_phpfunction_role)
 
     return {'parallel_read_safe': True}
 

@@ -15,7 +15,5 @@ class NumberedCodeBlock(CodeBlock):
         return super(NumberedCodeBlock, self).run();
 
 def setup(app):
-    app.add_directive('code-block', NumberedCodeBlock)
-    app.add_directive('sourcecode', NumberedCodeBlock)
-
-    return {'parallel_read_safe': True}
+    app.add_directive_to_domain('php', 'code-block', NumberedCodeBlock)
+    app.add_directive_to_domain('php', 'sourcecode', NumberedCodeBlock)
