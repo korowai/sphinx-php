@@ -85,5 +85,5 @@ class PHPDomain(Domain):
         return make_refnode(builder, fromdocname, obj[0], name, contnode, name)
 
     def get_objects(self):
-        for refname, (docname, type) in self.data['objects'].iteritems():
+        for refname, (docname, type) in self.data['objects'].items():
             yield refname, refname, type, docname, refname, 1
