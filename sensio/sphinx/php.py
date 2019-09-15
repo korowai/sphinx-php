@@ -8,7 +8,6 @@ from sphinx import addnodes
 from sphinx.domains import Domain, ObjType
 from sphinx.locale import _
 from sphinx.directives import ObjectDescription
-from sphinx.domains.python import py_paramlist_re as js_paramlist_re
 from sphinx.roles import XRefRole
 from sphinx.util.nodes import make_refnode
 from sphinx.util.docfields import Field, GroupedField, TypedField
